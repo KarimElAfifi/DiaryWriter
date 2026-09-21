@@ -7,17 +7,24 @@ import {
   loadBg,
   loadDarkMode,
   loadEntries,
+  loadSession,
+  loginUser,
+  registerUser,
   saveBg,
   saveDarkMode,
   saveEntries,
 } from "./services/storage.js";
 import "./styles/diary.css";
-import { CORRECT_PASSWORD, newEntry } from "./utils/diary.js";
+import { newEntry } from "./utils/diary.js";
 
 export default function DiaryWriter() {
   const [unlocked, setUnlocked] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authMode, setAuthMode] = useState("login");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [pwError, setPwError] = useState(false);
+  const [authError, setAuthError] = useState("");
   const [entries, setEntries] = useState([]);
   const [activeId, setActiveId] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -33,12 +40,24 @@ export default function DiaryWriter() {
   const saveTimerRef = useRef(null);
 
   useEffect(() => {
-    if (!unlocked) return;
+    const restoreSession = async () => {
+      const session = await loadSession();
+      if (!session?.userId) return;
+
+      setCurrentUser(session);
+      setUnlocked(true);
+    };
+
+    restoreSession();
+  }, []);
+
+  useEffect(() => {
+    if (!unlocked || !currentUser) return;
 
     const loadDiary = async () => {
       setLoading(true);
-      const storedEntries = await loadEntries();
-      const storedBg = await loadBg();
+      const storedEntries = await loadEntries(currentUser.userId);
+      const storedBg = await loadBg(currentUser.userId);
       const storedDarkMode = await loadDarkMode();
 
       setEntries(storedEntries);
@@ -49,7 +68,7 @@ export default function DiaryWriter() {
     };
 
     loadDiary();
-  }, [unlocked]);
+  }, [currentUser, unlocked]);
 
   useEffect(() => {
     document.body.classList.toggle("dark-mode", darkMode);
@@ -72,12 +91,23 @@ export default function DiaryWriter() {
   const hiddenEntries = entries.filter((entry) => entry.hidden);
   const deleteEntryTarget = entries.find((entry) => entry.id === deleteTarget) || null;
 
-  const handleUnlock = () => {
-    if (password === CORRECT_PASSWORD) {
+  const handleAuth = async () => {
+    setAuthError("");
+    setPwError(false);
+
+    const result =
+      authMode === "register"
+        ? await registerUser(username, password)
+        : await loginUser(username, password);
+
+    if (result.ok) {
+      setCurrentUser(result.user);
       setUnlocked(true);
+      setPassword("");
       return;
     }
 
+    setAuthError(result.error);
     setPwError(true);
     setTimeout(() => setPwError(false), 600);
   };
@@ -93,7 +123,7 @@ export default function DiaryWriter() {
       setSaved(false);
       clearTimeout(saveTimerRef.current);
       saveTimerRef.current = setTimeout(async () => {
-        await saveEntries(next);
+        if (currentUser) await saveEntries(currentUser.userId, next);
         setSaved(true);
       }, 800);
 
@@ -106,7 +136,7 @@ export default function DiaryWriter() {
 
     setEntries((prev) => {
       const next = [entry, ...prev];
-      saveEntries(next);
+      if (currentUser) saveEntries(currentUser.userId, next);
       return next;
     });
 
@@ -117,7 +147,7 @@ export default function DiaryWriter() {
   const deleteEntry = (id) => {
     setEntries((prev) => {
       const next = prev.filter((entry) => entry.id !== id);
-      saveEntries(next);
+      if (currentUser) saveEntries(currentUser.userId, next);
       return next;
     });
 
@@ -144,7 +174,7 @@ export default function DiaryWriter() {
     reader.onload = (ev) => {
       const url = ev.target.result;
       setBgUrl(url);
-      saveBg(url);
+      if (currentUser) saveBg(currentUser.userId, url);
     };
     reader.readAsDataURL(file);
     setSettingsOpen(false);
@@ -152,7 +182,7 @@ export default function DiaryWriter() {
 
   const resetBg = () => {
     setBgUrl(null);
-    saveBg(null);
+    if (currentUser) saveBg(currentUser.userId, null);
   };
 
   const toggleDarkMode = () => {
@@ -164,10 +194,15 @@ export default function DiaryWriter() {
   if (!unlocked) {
     return (
       <LockScreen
+        authError={authError}
+        authMode={authMode}
         password={password}
         pwError={pwError}
+        username={username}
+        onAuthModeChange={setAuthMode}
         onPasswordChange={setPassword}
-        onUnlock={handleUnlock}
+        onSubmit={handleAuth}
+        onUsernameChange={setUsername}
       />
     );
   }
@@ -195,6 +230,7 @@ export default function DiaryWriter() {
           bgFileRef={bgFileRef}
           bgUrl={bgUrl}
           darkMode={darkMode}
+          entries={entries}
           hiddenEntries={hiddenEntries}
           loading={loading}
           settingsOpen={settingsOpen}

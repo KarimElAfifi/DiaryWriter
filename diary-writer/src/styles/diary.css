@@ -87,6 +87,36 @@
     width: 280px;
   }
 
+  .lock-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    border: 1px solid rgba(196,168,130,0.28);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .lock-tab {
+    background: rgba(255,255,255,0.03);
+    border: none;
+    border-right: 1px solid rgba(196,168,130,0.22);
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    padding: 9px 10px;
+    text-transform: uppercase;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .lock-tab:last-child { border-right: none; }
+  .lock-tab:hover { color: var(--paper); }
+  .lock-tab.active {
+    background: rgba(196,168,130,0.16);
+    color: var(--accent-light);
+  }
+
   .lock-input {
     width: 100%;
     background: rgba(255,255,255,0.05);
@@ -107,6 +137,12 @@
     letter-spacing: 0.05em;
     font-size: 0.85rem;
     font-family: 'Inter', sans-serif;
+  }
+
+  .lock-input[type="text"] {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
   }
 
   .lock-input:focus { border-color: var(--accent-light); }
@@ -136,6 +172,13 @@
 
   .lock-btn:hover { background: var(--accent-light); }
   .lock-btn:active { transform: scale(0.98); }
+
+  .lock-error {
+    color: var(--danger);
+    font-size: 0.74rem;
+    line-height: 1.35;
+    text-align: center;
+  }
 
   .lock-hint {
     font-size: 0.72rem;
@@ -720,3 +763,53 @@
   .modal-btn.danger:hover { background: #7a3535; }
 
   body.dark-mode .modal-btn.danger:hover { background: #B65252; }
+
+
+  /* ── Statistics Panel ── */
+.stats-panel {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.stats-title {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.stats-empty {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.76rem;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(196,168,130,0.15);
+}
+
+.stat-row:last-child { border-bottom: none; }
+
+.stat-label { color: var(--muted); flex-shrink: 0; }
+
+.stat-value {
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.88rem;
+  color: var(--ink);
+  text-align: right;
+  font-weight: 400;
+}

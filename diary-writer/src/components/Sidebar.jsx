@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { formatDate } from "../utils/diary.js";
+import Statistics from "./statistics.jsx";
 import {
   BookIcon,
   ChevronDown,
@@ -14,6 +16,7 @@ export function Sidebar({
   bgFileRef,
   bgUrl,
   darkMode,
+  entries,
   hiddenEntries,
   loading,
   settingsOpen,
@@ -28,6 +31,8 @@ export function Sidebar({
   onToggleDarkMode,
   onToggleHide,
 }) {
+  const [showStats, setShowStats] = useState(false);
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -75,6 +80,20 @@ export function Sidebar({
                     style={{ display: "none" }}
                     onChange={onHandleBgFile}
                   />
+                </div>
+
+                <div className="settings-section">
+                  <div className="settings-label">Statistiken</div>
+                  <button
+                    className="settings-file-btn"
+                    style={{ width: "100%" }}
+                    onClick={() => {
+                      setShowStats((v) => !v);
+                      onSetSettingsOpen(false);
+                    }}
+                  >
+                    {showStats ? "Statistiken ausblenden" : "Statistiken anzeigen"}
+                  </button>
                 </div>
 
                 <div className="settings-section">
@@ -155,6 +174,8 @@ export function Sidebar({
           ))
         )}
       </div>
+
+      {showStats && <Statistics entries={entries} />}
     </aside>
   );
 }

@@ -1,5 +1,3 @@
-export const CORRECT_PASSWORD = "tagebuch";
-
 export const formatDate = (iso) => {
   const d = new Date(iso);
   return d.toLocaleDateString("de-DE", {
