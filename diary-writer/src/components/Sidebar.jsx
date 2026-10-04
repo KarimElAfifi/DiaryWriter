@@ -39,7 +39,7 @@ export function Sidebar({
         <div className="sidebar-top-row">
           <div className="app-brand">
             <BookIcon />
-            <span className="app-brand-name">Tagebuch</span>
+            <span className="app-brand-name">Diary</span>
           </div>
 
           <div className="settings-wrapper" ref={settingsRef}>
@@ -51,7 +51,7 @@ export function Sidebar({
             {settingsOpen && (
               <div className="settings-dropdown">
                 <div className="settings-section">
-                  <div className="settings-label">Darstellung</div>
+                  <div className="settings-label">Appearance</div>
                   <label className="theme-switch-row">
                     <span>Dark Mode</span>
                     <input
@@ -64,13 +64,13 @@ export function Sidebar({
                 </div>
 
                 <div className="settings-section">
-                  <div className="settings-label">Hintergrundbild</div>
+                  <div className="settings-label">Background image</div>
                   <div className="settings-row">
                     <button className="settings-file-btn" onClick={() => bgFileRef.current?.click()}>
-                      <ImageIcon /> Bild auswählen
+                      <ImageIcon /> Choose image
                     </button>
                     {bgUrl && (
-                      <button className="bg-reset-btn" onClick={onResetBg}>Zurücksetzen</button>
+                      <button className="bg-reset-btn" onClick={onResetBg}>Reset</button>
                     )}
                   </div>
                   <input
@@ -83,7 +83,7 @@ export function Sidebar({
                 </div>
 
                 <div className="settings-section">
-                  <div className="settings-label">Statistiken</div>
+                  <div className="settings-label">Statistics</div>
                   <button
                     className="settings-file-btn"
                     style={{ width: "100%" }}
@@ -92,21 +92,21 @@ export function Sidebar({
                       onSetSettingsOpen(false);
                     }}
                   >
-                    {showStats ? "Statistiken ausblenden" : "Statistiken anzeigen"}
+                    {showStats ? "Hide statistics" : "Show statistics"}
                   </button>
                 </div>
 
                 <div className="settings-section">
                   <div className="settings-label">
-                    Ausgeblendete Einträge ({hiddenEntries.length})
+                    Hidden entries ({hiddenEntries.length})
                   </div>
                   {hiddenEntries.length === 0 ? (
-                    <p className="no-hidden">Keine ausgeblendeten Einträge</p>
+                    <p className="no-hidden">No hidden entries</p>
                   ) : (
                     <div className="hidden-entries-list">
                       {hiddenEntries.map((entry) => (
                         <div key={entry.id} className="hidden-entry-row">
-                          <span className="hidden-entry-title">{entry.title || "Kein Titel"}</span>
+                          <span className="hidden-entry-title">{entry.title || "Untitled"}</span>
                           <button
                             className="hidden-action-btn"
                             onClick={() => {
@@ -115,7 +115,7 @@ export function Sidebar({
                               onSetSettingsOpen(false);
                             }}
                           >
-                            Einblenden
+                            Show
                           </button>
                         </div>
                       ))}
@@ -128,15 +128,15 @@ export function Sidebar({
         </div>
 
         <button className="new-entry-btn" onClick={onCreateEntry}>
-          <PlusIcon /> Neuer Eintrag
+          <PlusIcon /> New entry
         </button>
       </div>
 
       <div className="entries-list">
         {loading ? (
-          <div className="entries-empty">Lade Einträge...</div>
+          <div className="entries-empty">Loading entries...</div>
         ) : visibleEntries.length === 0 ? (
-          <div className="entries-empty">Noch keine Einträge.<br />Starte mit einem neuen Eintrag.</div>
+          <div className="entries-empty">No entries yet.<br />Start with a new entry.</div>
         ) : (
           visibleEntries.map((entry) => (
             <div
@@ -145,13 +145,13 @@ export function Sidebar({
               onClick={() => onSelectEntry(entry.id)}
             >
               <div className="entry-item-info">
-                <div className="entry-item-title">{entry.title || "Kein Titel"}</div>
+                <div className="entry-item-title">{entry.title || "Untitled"}</div>
                 <div className="entry-item-date">{formatDate(entry.updatedAt)}</div>
               </div>
               <div className="entry-actions">
                 <button
                   className="entry-action-btn hide-btn"
-                  title="Ausblenden"
+                  title="Hide"
                   onClick={(ev) => {
                     ev.stopPropagation();
                     onToggleHide(entry.id);
@@ -161,7 +161,7 @@ export function Sidebar({
                 </button>
                 <button
                   className="entry-action-btn delete-btn"
-                  title="Löschen"
+                  title="Delete"
                   onClick={(ev) => {
                     ev.stopPropagation();
                     onDeleteEntry(entry.id);

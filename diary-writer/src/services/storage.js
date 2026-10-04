@@ -69,7 +69,7 @@ export const registerUser = async (username, password) => {
   const cleanUsername = username.trim();
 
   if (!cleanUsername || !password) {
-    return { ok: false, error: "Bitte Benutzername und Passwort eingeben." };
+    return { ok: false, error: "Please enter a username and password." };
   }
 
   const users = await loadUsers();
@@ -79,7 +79,7 @@ export const registerUser = async (username, password) => {
   );
 
   if (exists) {
-    return { ok: false, error: "Dieser Benutzername existiert bereits." };
+    return { ok: false, error: "This username already exists." };
   }
 
   const salt = crypto.randomUUID();
@@ -103,7 +103,7 @@ export const loginUser = async (username, password) => {
   const cleanUsername = username.trim();
 
   if (!cleanUsername || !password) {
-    return { ok: false, error: "Bitte Benutzername und Passwort eingeben." };
+    return { ok: false, error: "Please enter a username and password." };
   }
 
   const users = await loadUsers();
@@ -112,12 +112,12 @@ export const loginUser = async (username, password) => {
   );
 
   if (!user) {
-    return { ok: false, error: "Benutzername oder Passwort ist falsch." };
+    return { ok: false, error: "Incorrect username or password." };
   }
 
   const passwordHash = await hashPassword(password, user.salt);
   if (passwordHash !== user.passwordHash) {
-    return { ok: false, error: "Benutzername oder Passwort ist falsch." };
+    return { ok: false, error: "Incorrect username or password." };
   }
 
   const session = { userId: user.id, username: user.username };

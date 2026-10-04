@@ -1,4 +1,4 @@
-// Statistics.jsx
+// Statistics component
 export default function Statistics({ entries }) {
   const visible = entries.filter((e) => !e.hidden);
   const all = entries;
@@ -24,46 +24,46 @@ export default function Statistics({ entries }) {
   )[0];
 
   const formatDate = (iso) =>
-    new Date(iso).toLocaleDateString("de-DE", {
+    new Date(iso).toLocaleDateString("en-US", {
       day: "2-digit",
       month: "short",
       year: "numeric",
     });
 
   const stats = [
-    { label: "Einträge gesamt", value: all.length },
-    { label: "Sichtbare Einträge", value: visible.length },
-    { label: "Ausgeblendet", value: all.length - visible.length },
-    { label: "Wörter gesamt", value: totalWords.toLocaleString("de-DE") },
-    { label: "Zeichen gesamt", value: totalChars.toLocaleString("de-DE") },
-    { label: "Ø Wörter pro Eintrag", value: avgWords },
+    { label: "Total entries", value: all.length },
+    { label: "Visible entries", value: visible.length },
+    { label: "Hidden", value: all.length - visible.length },
+    { label: "Total words", value: totalWords.toLocaleString("en-US") },
+    { label: "Total characters", value: totalChars.toLocaleString("en-US") },
+    { label: "Average words per entry", value: avgWords },
     {
-      label: "Längster Titel",
+      label: "Longest title",
       value: longestTitleEntry?.title
         ? `„${longestTitleEntry.title.slice(0, 22)}${longestTitleEntry.title.length > 22 ? "…" : ""}"`
         : "—",
     },
     {
-      label: "Längster Eintrag",
+      label: "Longest entry",
       value: longestContentEntry?.title
         ? `„${longestContentEntry.title.slice(0, 22)}${longestContentEntry.title.length > 22 ? "…" : ""}"`
         : "—",
     },
     {
-      label: "Erster Eintrag",
+      label: "First entry",
       value: oldestEntry ? formatDate(oldestEntry.createdAt) : "—",
     },
     {
-      label: "Zuletzt bearbeitet",
+      label: "Last edited",
       value: mostRecentEntry ? formatDate(mostRecentEntry.updatedAt) : "—",
     },
   ];
 
   return (
     <div className="stats-panel">
-      <div className="stats-title">Statistiken</div>
+      <div className="stats-title">Statistics</div>
       {all.length === 0 ? (
-        <p className="stats-empty">Noch keine Einträge vorhanden.</p>
+        <p className="stats-empty">No entries yet.</p>
       ) : (
         <div className="stats-grid">
           {stats.map((s) => (

@@ -626,16 +626,16 @@
     font-size: 1.15rem;
     font-weight: 300;
     color: var(--ink);
-    line-height: 1.9;
+    line-height: 1.5rem;
     resize: none;
     padding: 0;
     /* lined-paper effect */
     background-image: repeating-linear-gradient(
       to bottom,
       transparent,
-      transparent calc(1.9em - 1px),
-      var(--line-color) calc(1.9em - 1px),
-      var(--line-color) 1.9em
+      transparent calc(1.5rem - 1px),
+      var(--line-color) calc(1.5rem - 1px),
+      var(--line-color) 1.5rem
     );
     background-attachment: local;
   }

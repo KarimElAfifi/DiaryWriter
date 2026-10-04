@@ -14,10 +14,10 @@ export function Editor({
         <div className="editor-empty">
           <div className="editor-empty-icon"><BookIcon /></div>
           <p className="editor-empty-text">
-            Wähle einen Eintrag aus, oder beginne mit einem neuen Gedanken.
+            Select an entry or start with a new thought.
           </p>
           <span className="editor-empty-sub" onClick={onCreateEntry}>
-            + Neuen Eintrag erstellen
+            + Create a new entry
           </span>
         </div>
       </main>
@@ -34,7 +34,7 @@ export function Editor({
           <textarea
             ref={titleRef}
             className="editor-title-input"
-            placeholder="Titel des Eintrags ..."
+            placeholder="Entry title..."
             value={activeEntry.title}
             rows={1}
             onChange={(e) => {
@@ -46,7 +46,7 @@ export function Editor({
           <div className="editor-divider" />
           <textarea
             className="editor-content-input"
-            placeholder="Schreibe hier deine Gedanken nieder ..."
+            placeholder="Write your thoughts here..."
             value={activeEntry.content}
             onChange={(e) => onUpdateEntry(activeEntry.id, { content: e.target.value })}
           />
@@ -55,11 +55,11 @@ export function Editor({
 
       <div className="status-bar">
         <div className="status-left">
-          <span>{wordCount} Wörter</span>
-          <span>{activeEntry.content.length} Zeichen</span>
+          <span>{wordCount} words</span>
+          <span>{activeEntry.content.length} characters</span>
         </div>
         <span className={saved ? "status-saved" : ""}>
-          {saved ? "Gespeichert" : "Speichern ..."}
+          {saved ? "Saved" : "Saving..."}
         </span>
       </div>
     </main>

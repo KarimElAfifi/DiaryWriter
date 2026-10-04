@@ -1,8 +1,8 @@
 # DiaryWriter
 
-Eine lokale React-App zum Schreiben und Verwalten von Tagebucheintraegen.
+A local React app for writing and managing diary entries.
 
-## Entwicklung
+## Development
 
 ```sh
 npm install
