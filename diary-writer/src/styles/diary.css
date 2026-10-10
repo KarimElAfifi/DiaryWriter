@@ -682,14 +682,14 @@
 
   .editor-empty-icon { opacity: 0.3; }
 
-  .editor-empty-text {
+  .editor-empty-text, .editor-empty-title, .editor-empty-subtitle {
     font-family: 'Crimson Pro', serif;
     font-size: 1.3rem;
     font-weight: 300;
     font-style: italic;
     text-align: center;
-    line-height: 1.6;
-    max-width: 320px;
+    line-height: 1.5;
+    max-width: 350px;
   }
 
   .editor-empty-sub {

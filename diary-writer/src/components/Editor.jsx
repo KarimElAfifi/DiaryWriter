@@ -8,14 +8,18 @@ export function Editor({
   titleRef,
   onCreateEntry,
   onUpdateEntry,
-}) {
+  username,
+
+  }) {
   if (!activeEntry) {
     return (
       <main className="editor-area">
         <div className="editor-empty">
           <div className="editor-empty-icon"><BookIcon /></div>
+          <h2 className="editor-empty-title">Welcome, {username}!</h2>
+          <h4 className="editor-empty-subtitle">Are you ready to share your thoughts?</h4>
           <p className="editor-empty-text">
-            Select an entry or start with a new thought.
+            Select an entry or start with a new diary page.
           </p>
           <span className="editor-empty-sub" onClick={onCreateEntry}>
             + Create a new entry

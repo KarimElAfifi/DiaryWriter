@@ -315,6 +315,7 @@ export default function DiaryWriter() {
           titleRef={titleRef}
           onCreateEntry={createEntry}
           onUpdateEntry={updateEntry}
+          username={currentUser?.username}
         />
       </div>
     </>

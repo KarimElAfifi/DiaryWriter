@@ -1,4 +1,5 @@
 const API_BASE = "/api";
+let entriesSaveQueue = Promise.resolve();
 
 class ApiError extends Error {
   constructor(message, status) {
@@ -79,11 +80,14 @@ export const loadEntries = async () => {
   return data.entries;
 };
 
-export const saveEntries = (entries) =>
-  request("/entries", {
-    method: "PUT",
-    body: JSON.stringify({ entries }),
-  });
+export const saveEntries = (entries) => {
+  const body = JSON.stringify({ entries });
+  const save = entriesSaveQueue.then(() =>
+    request("/entries", { method: "PUT", body })
+  );
+  entriesSaveQueue = save.catch(() => {});
+  return save;
+};
 
 export const loadPreferences = async () => {
   const data = await request("/preferences");
