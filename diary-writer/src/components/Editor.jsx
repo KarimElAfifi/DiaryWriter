@@ -4,6 +4,7 @@ import { BookIcon } from "./icons.jsx";
 export function Editor({
   activeEntry,
   saved,
+  saveError,
   titleRef,
   onCreateEntry,
   onUpdateEntry,
@@ -58,8 +59,8 @@ export function Editor({
           <span>{wordCount} words</span>
           <span>{activeEntry.content.length} characters</span>
         </div>
-        <span className={saved ? "status-saved" : ""}>
-          {saved ? "Saved" : "Saving..."}
+        <span className={saveError ? "status-error" : saved ? "status-saved" : ""}>
+          {saveError ? "Save failed" : saved ? "Saved" : "Saving..."}
         </span>
       </div>
     </main>

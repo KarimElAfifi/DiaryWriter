@@ -58,7 +58,7 @@ export function LockScreen({
         {authError && <span className="lock-error">{authError}</span>}
         <span className="lock-hint">
           {isRegistering
-            ? "Your account is stored locally on this device."
+            ? "Your account and diary entries are saved on the server."
             : "Sign in to your account."}
         </span>
       </div>

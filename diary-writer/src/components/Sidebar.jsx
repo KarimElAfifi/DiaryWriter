@@ -17,6 +17,7 @@ export function Sidebar({
   bgUrl,
   darkMode,
   entries,
+  currentUser,
   hiddenEntries,
   loading,
   settingsOpen,
@@ -25,6 +26,7 @@ export function Sidebar({
   onCreateEntry,
   onDeleteEntry,
   onHandleBgFile,
+  onLogout,
   onResetBg,
   onSelectEntry,
   onSetSettingsOpen,
@@ -50,6 +52,13 @@ export function Sidebar({
 
             {settingsOpen && (
               <div className="settings-dropdown">
+                <div className="settings-section">
+                  <div className="settings-label">{currentUser?.username}</div>
+                  <button className="settings-file-btn" style={{ width: "100%" }} onClick={onLogout}>
+                    Sign out
+                  </button>
+                </div>
+
                 <div className="settings-section">
                   <div className="settings-label">Appearance</div>
                   <label className="theme-switch-row">

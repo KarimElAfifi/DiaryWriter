@@ -4,14 +4,13 @@ import { Editor } from "./components/Editor.jsx";
 import { LockScreen } from "./components/LockScreen.jsx";
 import { Sidebar } from "./components/Sidebar.jsx";
 import {
-  loadBg,
-  loadDarkMode,
   loadEntries,
   loadSession,
   loginUser,
+  loadPreferences,
+  logoutUser,
   registerUser,
-  saveBg,
-  saveDarkMode,
+  savePreferences,
   saveEntries,
 } from "./services/storage.js";
 import "./styles/diary.css";
@@ -30,9 +29,11 @@ export default function DiaryWriter() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [bgUrl, setBgUrl] = useState(null);
   const [saved, setSaved] = useState(true);
+  const [saveError, setSaveError] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [loading, setLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [appError, setAppError] = useState("");
 
   const settingsRef = useRef(null);
   const bgFileRef = useRef(null);
@@ -41,11 +42,15 @@ export default function DiaryWriter() {
 
   useEffect(() => {
     const restoreSession = async () => {
-      const session = await loadSession();
-      if (!session?.userId) return;
+      try {
+        const session = await loadSession();
+        if (!session?.userId) return;
 
-      setCurrentUser(session);
-      setUnlocked(true);
+        setCurrentUser(session);
+        setUnlocked(true);
+      } catch (error) {
+        setAuthError(error.message);
+      }
     };
 
     restoreSession();
@@ -56,15 +61,21 @@ export default function DiaryWriter() {
 
     const loadDiary = async () => {
       setLoading(true);
-      const storedEntries = await loadEntries(currentUser.userId);
-      const storedBg = await loadBg(currentUser.userId);
-      const storedDarkMode = await loadDarkMode();
-
-      setEntries(storedEntries);
-      setBgUrl(storedBg);
-      setDarkMode(storedDarkMode);
-      setActiveId(storedEntries[0]?.id || null);
-      setLoading(false);
+      try {
+        const [storedEntries, preferences] = await Promise.all([
+          loadEntries(),
+          loadPreferences(),
+        ]);
+        setEntries(storedEntries);
+        setBgUrl(preferences.background || null);
+        setDarkMode(preferences.darkMode);
+        setActiveId(storedEntries[0]?.id || null);
+        setAppError("");
+      } catch (error) {
+        setAppError(`Could not load your diary: ${error.message}`);
+      } finally {
+        setLoading(false);
+      }
     };
 
     loadDiary();
@@ -95,10 +106,16 @@ export default function DiaryWriter() {
     setAuthError("");
     setPwError(false);
 
-    const result =
-      authMode === "register"
-        ? await registerUser(username, password)
-        : await loginUser(username, password);
+    let result;
+    try {
+      result =
+        authMode === "register"
+          ? await registerUser(username, password)
+          : await loginUser(username, password);
+    } catch (error) {
+      setAuthError(`Could not connect to the server: ${error.message}`);
+      return;
+    }
 
     if (result.ok) {
       setCurrentUser(result.user);
@@ -121,10 +138,19 @@ export default function DiaryWriter() {
       );
 
       setSaved(false);
+      setSaveError(false);
       clearTimeout(saveTimerRef.current);
       saveTimerRef.current = setTimeout(async () => {
-        if (currentUser) await saveEntries(currentUser.userId, next);
-        setSaved(true);
+        if (!currentUser) return;
+        try {
+          await saveEntries(next);
+          setSaved(true);
+          setSaveError(false);
+          setAppError("");
+        } catch (error) {
+          setSaveError(true);
+          setAppError(`Could not save your entry: ${error.message}`);
+        }
       }, 800);
 
       return next;
@@ -136,7 +162,11 @@ export default function DiaryWriter() {
 
     setEntries((prev) => {
       const next = [entry, ...prev];
-      if (currentUser) saveEntries(currentUser.userId, next);
+      if (currentUser) {
+        saveEntries(next).catch((error) =>
+          setAppError(`Could not save your entry: ${error.message}`)
+        );
+      }
       return next;
     });
 
@@ -147,7 +177,11 @@ export default function DiaryWriter() {
   const deleteEntry = (id) => {
     setEntries((prev) => {
       const next = prev.filter((entry) => entry.id !== id);
-      if (currentUser) saveEntries(currentUser.userId, next);
+      if (currentUser) {
+        saveEntries(next).catch((error) =>
+          setAppError(`Could not save your entry: ${error.message}`)
+        );
+      }
       return next;
     });
 
@@ -174,7 +208,11 @@ export default function DiaryWriter() {
     reader.onload = (ev) => {
       const url = ev.target.result;
       setBgUrl(url);
-      if (currentUser) saveBg(currentUser.userId, url);
+      if (currentUser) {
+        savePreferences({ background: url }).catch((error) =>
+          setAppError(`Could not save your settings: ${error.message}`)
+        );
+      }
     };
     reader.readAsDataURL(file);
     setSettingsOpen(false);
@@ -182,13 +220,34 @@ export default function DiaryWriter() {
 
   const resetBg = () => {
     setBgUrl(null);
-    if (currentUser) saveBg(currentUser.userId, null);
+    if (currentUser) {
+      savePreferences({ background: "" }).catch((error) =>
+        setAppError(`Could not save your settings: ${error.message}`)
+      );
+    }
   };
 
   const toggleDarkMode = () => {
     const next = !darkMode;
     setDarkMode(next);
-    saveDarkMode(next);
+    savePreferences({ darkMode: next }).catch((error) =>
+      setAppError(`Could not save your settings: ${error.message}`)
+    );
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      setCurrentUser(null);
+      setUnlocked(false);
+      setEntries([]);
+      setActiveId(null);
+      setPassword("");
+      setAppError("");
+      clearTimeout(saveTimerRef.current);
+    } catch (error) {
+      setAppError(`Could not sign out: ${error.message}`);
+    }
   };
 
   if (!unlocked) {
@@ -225,12 +284,14 @@ export default function DiaryWriter() {
       )}
 
       <div className="app">
+        {appError && <div className="app-error" role="alert">{appError}</div>}
         <Sidebar
           activeId={activeId}
           bgFileRef={bgFileRef}
           bgUrl={bgUrl}
           darkMode={darkMode}
           entries={entries}
+          currentUser={currentUser}
           hiddenEntries={hiddenEntries}
           loading={loading}
           settingsOpen={settingsOpen}
@@ -239,6 +300,7 @@ export default function DiaryWriter() {
           onCreateEntry={createEntry}
           onDeleteEntry={setDeleteTarget}
           onHandleBgFile={handleBgFile}
+          onLogout={handleLogout}
           onResetBg={resetBg}
           onSelectEntry={setActiveId}
           onSetSettingsOpen={setSettingsOpen}
@@ -249,6 +311,7 @@ export default function DiaryWriter() {
         <Editor
           activeEntry={activeEntry}
           saved={saved}
+          saveError={saveError}
           titleRef={titleRef}
           onCreateEntry={createEntry}
           onUpdateEntry={updateEntry}

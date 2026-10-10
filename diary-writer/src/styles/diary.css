@@ -197,6 +197,21 @@
     position: relative;
   }
 
+  .app-error {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    max-width: min(680px, calc(100vw - 32px));
+    padding: 9px 14px;
+    border: 1px solid var(--danger);
+    border-radius: 4px;
+    background: var(--paper);
+    color: var(--danger);
+    font-size: 0.8rem;
+  }
+
   .app-bg {
     position: fixed;
     inset: 0;
@@ -705,6 +720,7 @@
 
   .status-left { display: flex; gap: 16px; align-items: center; }
   .status-saved { color: var(--accent); display: flex; align-items: center; gap: 4px; }
+  .status-error { color: var(--danger); }
 
   /* Modal overlay for delete confirm */
   .modal-overlay {

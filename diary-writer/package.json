@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "backend:run": ".\\.venv\\Scripts\\python.exe manage.py runserver",
+    "backend:migrate": ".\\.venv\\Scripts\\python.exe manage.py migrate",
+    "backend:test": ".\\.venv\\Scripts\\python.exe manage.py test"
   },
   "dependencies": {
     "react": "^19.2.6",
